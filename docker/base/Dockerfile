@@ -154,10 +154,10 @@ RUN sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release 
 
 WORKDIR ${WORK_DIR}
 
-COPY Taskfile.yaml ${WORK_DIR}/Taskfile.yaml
-COPY ./hack ${WORK_DIR}/hack
-COPY mtm/embed/bin ${WORK_DIR}/bin
-COPY bin/garagemq ${WORK_DIR}/bin/garagemq
+# COPY Taskfile.yaml ${WORK_DIR}/Taskfile.yaml
+# COPY ./hack ${WORK_DIR}/hack
+# COPY mtm/embed/bin ${WORK_DIR}/bin
+# COPY bin/garagemq ${WORK_DIR}/bin/garagemq
 
 RUN bash ${WORK_DIR}/hack/dev/pkg.sh install
 
@@ -167,17 +167,17 @@ RUN echo "${NONROOT_USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # RUN bash ${WORK_DIR}/hack/dev/install_py install
 
-RUN bash ${WORK_DIR}/hack/dev/pkg.sh install_nodejs
+# RUN bash ${WORK_DIR}/hack/dev/pkg.sh install_nodejs
 
-RUN node -v &&  npm -v && bun -v && pnpm -v
+# RUN node -v &&  npm -v && bun -v && pnpm -v
 
-RUN GOLANG_VERSION=${GOLANG_VERSION} bash ${WORK_DIR}/hack/dev/install-golang.sh install
+# RUN GOLANG_VERSION=${GOLANG_VERSION} bash ${WORK_DIR}/hack/dev/install-golang.sh install
 
-RUN bash ${WORK_DIR}/hack/dev/vnc install
+# RUN bash ${WORK_DIR}/hack/dev/vnc install
 
-RUN bash ${WORK_DIR}/hack/dev/pkg.sh playwright
+# RUN bash ${WORK_DIR}/hack/dev/pkg.sh playwright
 
-CMD ["dockerentry"]
+# CMD ["dockerentry"]
 
 
 
