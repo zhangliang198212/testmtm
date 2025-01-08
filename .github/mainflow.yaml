@@ -1,0 +1,100 @@
+name: build
+
+on:
+  workflow_dispatch:
+    inputs:
+      input:
+        description: "功能选项 (1: 仅构建, 2: 构建并部署, 3: 构建docker镜像并发布)"
+        required: true
+        type: choice
+        options:
+          - "1"
+          - "2"
+          - "3"
+        default: "1"
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+# 添加必要的权限
+permissions:
+  contents: write
+  packages: write
+  actions: write
+  id-token: write
+
+jobs:
+  main_route:
+    runs-on: ubuntu-latest
+    outputs:
+      nextjob: ${{ steps.check_message.outputs.nextjob }}
+    steps:
+      - name: Check commit message
+        id: check_message
+        run: |
+          message="${{ github.event.head_commit.message }}"
+          if [[ $message =~ run_([^[:space:]]+) ]]; then
+            echo "nextjob=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+            echo "成功设置下一步: ${BASH_REMATCH[1]}"
+          else
+            echo "nextjob=none" >> $GITHUB_OUTPUT
+            echo "未设置下一步"
+          fi
+        shell: bash
+      - name: output_tag
+        run: echo "LATEST_TAG=${{ env.LATEST_TAG }}" >> $GITHUB_OUTPUT
+
+  debug_info:
+    needs: main_route
+    if: needs.main_route.outputs.nextjob != 'none'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show routing info
+        run: |
+          echo "Commit message: ${{ github.event.head_commit.message }}"
+          echo "Next job to run: ${{ needs.main_route.outputs.nextjob }}"
+
+      - name: Show commit info
+        run: |
+          echo "Commit message: ${{ github.event.head_commit.message }}"
+          echo "Commit author: ${{ github.event.head_commit.author.name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+
+      - name: Show GitHub context
+        run: echo "${{ toJSON(github) }}"
+
+      - name: Show environment variables
+        run: env
+  # 构建和发布 npm 包
+  build_npm_packages:
+    needs: [main_route]
+    if: needs.main_route.outputs.nextjob == 'build_npm_packages'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup GitHub CLI
+        run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+
+      - name: Download with gh CLI
+        run: |
+          gh release download latest \
+            --repo codeh007/gomtm \
+            --pattern "gomtm" \
+            --dir .
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: chmod
+        run: chmod +x ./gomtm
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: 使用 gomtm build 构建 npm 包
+        run: ./gomtm release build_npm_packages
