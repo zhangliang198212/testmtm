@@ -1,5 +1,7 @@
 
 code
+.vscode
+.venv
 # Logs
 logs
 *.log
