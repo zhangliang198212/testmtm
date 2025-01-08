@@ -27,6 +27,16 @@ env:
   # else with 'pre' (if push to master)
   DOCKER_IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.event_name == 'workflow_dispatch' && github.event.inputs.tag || 'pre' }}
 
+# 方式 1: 取消进行中的工作流
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# 方式 2: 更细粒度的控制，基于分支或其他条件
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref_name }}
+#   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
