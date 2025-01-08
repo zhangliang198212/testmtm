@@ -20,17 +20,6 @@ def main():
     def cli():
         pass
 
-    # register_build_commands(cli)
-    # register_clean_commands(cli)
-    # register_db_commands(cli)
-    # register_deploy_commands(cli)
-    # register_gen_commands(cli)
-    # register_init_commands(cli)
-    # register_release_commands(cli)
-    # register_selenium_commands(cli)
-
-    # register_serve_commands(cli)
-    # def register_serve_commands(cli):
     @cli.command()
     def serve():
         from mtmai.core.config import settings
@@ -48,7 +37,7 @@ def main():
 
         worker_app = WorkerApp(url)
         asyncio.run(worker_app.deploy_mtmai_workers(url))
-        
+
     @cli.command()
     @click.option("--url", required=False)
     def worker2(url):
