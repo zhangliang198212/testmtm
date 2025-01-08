@@ -7,14 +7,6 @@ load_dotenv()
 
 
 def main():
-    # from mtmai.cli.build import register_build_commands
-    # from mtmai.cli.clean import register_clean_commands
-    # from mtmai.cli.db import register_db_commands
-    # from mtmai.cli.dp import register_deploy_commands
-    # from mtmai.cli.gen import register_gen_commands
-    # from mtmai.cli.init import register_init_commands
-    # from mtmai.cli.release import register_release_commands
-    # from mtmai.cli.selenium import register_selenium_commands
 
     @click.group()
     def cli():

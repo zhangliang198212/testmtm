@@ -4,7 +4,8 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from mtmaisdk.utils.env import is_in_huggingface, is_in_vercel
-from pydantic import AnyUrl, BeforeValidator, HttpUrl, computed_field, model_validator
+from pydantic import (AnyUrl, BeforeValidator, HttpUrl, computed_field,
+                      model_validator)
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self
 
@@ -264,7 +265,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore
-
-# def setup_settings():
-#     if is_dev
-#     settings.HATCHET_CLIENT_TOKEN = os.getenv("HATCHET_CLIENT_TOKEN")
