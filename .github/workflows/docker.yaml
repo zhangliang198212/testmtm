@@ -58,6 +58,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: gitgit188/gomtm:latest
-          dockerfile: docker/gomtm/Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USER }}/gomtm:latest
+          dockerfile: docker/base/Dockerfile
           target: mtmbase
