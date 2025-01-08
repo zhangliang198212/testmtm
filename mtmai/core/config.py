@@ -244,7 +244,7 @@ class Settings(BaseSettings):
     SELENIUM_HUB_URL: str | None = None  # "http://localhost:4444/wd/hub"
 
     # mtmflow
-    MTMFLOW_URL_BASE: str = "http://localhost:8001"
+    # MTMFLOW_URL_BASE: str = "http://localhost:8001"
 
     # 其他
     graph_config_path: str = "configs/graph_config.yml"
@@ -262,6 +262,5 @@ class Settings(BaseSettings):
     HATCHET_CLIENT_TOKEN: str | None = (
         "eyJhbGciOiJFUzI1NiIsImtpZCI6Impfd1YwZyJ9.eyJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJleHAiOjQ4ODU2MjY0MzYsImdycGNfYnJvYWRjYXN0X2FkZHJlc3MiOiJsb2NhbGhvc3Q6NzA3NyIsImlhdCI6MTczMjAyNjQzNiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwIiwic2VydmVyX3VybCI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MCIsInN1YiI6IjcwN2QwODU1LTgwYWItNGUxZi1hMTU2LWYxYzQ1NDZjYmY1MiIsInRva2VuX2lkIjoiYjEzM2EzOTUtMTE0My00ZTVkLTk4ZDAtYzA2MWRkNWFmODFlIn0.g50P75L3042NEa-4tTSrPecqoHps7zbNYzzrDousxBA00q2opXEJTYyrmtSa29crhlVc3XwNl5at9guIFoYf7w"
     )
-
 
 settings = Settings()  # type: ignore
