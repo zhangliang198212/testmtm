@@ -4,7 +4,7 @@ on:
     tags:
       - "*"
     branches:
-      - master
+      - main
     paths:
       - docker/**/*
   workflow_dispatch:
