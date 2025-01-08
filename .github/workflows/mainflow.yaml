@@ -104,17 +104,19 @@ jobs:
     needs: [main_route]
     if: needs.main_route.outputs.nextjob == 'build_py'
     steps:
-      - name: 使用 gomtm build 构建 python 包
-        run: ./gomtm release build_py
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Install a semver range of uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          version: ">=0.4.0"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip' # caching pip dependencies
+      - run: uv pip install -r requirements.txt
 
       - name: Setup GitHub CLI
         run: |
