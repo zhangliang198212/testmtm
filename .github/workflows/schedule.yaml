@@ -34,10 +34,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10 # 限制最长运行时间为10分钟
     steps:
-      - name: Your task
+      - name: run worker
         run: |
-          echo "Starting task..."
-          # 你的任务代码
+          python __main__.py worker2
 
       # 可选：添加超时处理
       - name: Cleanup on timeout
