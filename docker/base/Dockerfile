@@ -159,7 +159,7 @@ WORKDIR ${WORK_DIR}
 # COPY mtm/embed/bin ${WORK_DIR}/bin
 # COPY bin/garagemq ${WORK_DIR}/bin/garagemq
 
-RUN bash ${WORK_DIR}/hack/dev/pkg.sh install
+# RUN bash ${WORK_DIR}/hack/dev/pkg.sh install
 
 RUN useradd --user-group --create-home --no-log-init --shell /bin/bash ${NONROOT_USER}
 RUN usermod -aG sudo ${NONROOT_USER}
