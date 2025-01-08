@@ -89,6 +89,9 @@ jobs:
         uses: astral-sh/setup-uv@v5
         with:
           version: ">=0.5.15"
+          enable-cache: true
+          # cache-local-path: "/path/to/cache"
+          cache-dependency-glob: "uv.lock"
 
       - name: "Set up Python"
         uses: actions/setup-python@v5
