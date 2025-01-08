@@ -6,7 +6,7 @@ on:
     branches:
       - master
     paths:
-      - docker/**
+      - docker/**/*
   workflow_dispatch:
     inputs:
       tag:
