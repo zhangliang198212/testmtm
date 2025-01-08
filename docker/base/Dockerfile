@@ -149,38 +149,10 @@ RUN sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release 
     && apt-get update && apt-get install -yqq --no-install-recommends postgresql-16 postgresql-16-pgvector \
     && apt -y autoremove && apt-get -y clean && rm -rf /tmp/* && rm -rf /var/lib/apt/lists/*
 
-
-
-
 WORKDIR ${WORK_DIR}
-
-# COPY Taskfile.yaml ${WORK_DIR}/Taskfile.yaml
-# COPY ./hack ${WORK_DIR}/hack
-# COPY mtm/embed/bin ${WORK_DIR}/bin
-# COPY bin/garagemq ${WORK_DIR}/bin/garagemq
-
-# RUN bash ${WORK_DIR}/hack/dev/pkg.sh install
-
 RUN useradd --user-group --create-home --no-log-init --shell /bin/bash ${NONROOT_USER}
 RUN usermod -aG sudo ${NONROOT_USER}
 RUN echo "${NONROOT_USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
-# RUN bash ${WORK_DIR}/hack/dev/install_py install
-
-# RUN bash ${WORK_DIR}/hack/dev/pkg.sh install_nodejs
-
-# RUN node -v &&  npm -v && bun -v && pnpm -v
-
-# RUN GOLANG_VERSION=${GOLANG_VERSION} bash ${WORK_DIR}/hack/dev/install-golang.sh install
-
-# RUN bash ${WORK_DIR}/hack/dev/vnc install
-
-# RUN bash ${WORK_DIR}/hack/dev/pkg.sh playwright
-
-# CMD ["dockerentry"]
-
-
-
 
 # ================================================================================================================================================
 FROM kalilinux/kali-rolling:latest AS build_base
