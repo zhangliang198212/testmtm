@@ -138,6 +138,3 @@ jobs:
 
       - name: Make gomtm executable
         run: chmod +x ./gomtm
-
-      - name: 使用 gomtm build 构建 python 包
-        run: ./gomtm release build_py
