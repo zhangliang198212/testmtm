@@ -14,8 +14,26 @@ on:
         default: "1"
   push:
     branches: ["main"]
+    paths:
+      - mtmai/**/*
+
   pull_request:
     branches: ["main"]
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Docker image tag"
+        default: "dev"
+      khoj:
+        description: "Build Khoj docker image"
+        type: boolean
+        default: true
+      khoj-cloud:
+        description: "Build Khoj cloud docker image"
+        type: boolean
+        default: true
+
 
 # 添加必要的权限
 permissions:
@@ -24,30 +42,34 @@ permissions:
   actions: write
   id-token: write
 
+# 并发控制(自动取消之前没完成的工作流)
+# 方式 1: 取消进行中的工作流
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  main_route:
-    runs-on: ubuntu-latest
-    outputs:
-      nextjob: ${{ steps.check_message.outputs.nextjob }}
-    steps:
-      - name: Check commit message
-        id: check_message
-        run: |
-          message="${{ github.event.head_commit.message }}"
-          if [[ $message =~ run_([^[:space:]]+) ]]; then
-            echo "nextjob=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
-            echo "成功设置下一步: ${BASH_REMATCH[1]}"
-          else
-            echo "nextjob=none" >> $GITHUB_OUTPUT
-            echo "未设置下一步"
-          fi
-        shell: bash
-      - name: output_tag
-        run: echo "LATEST_TAG=${{ env.LATEST_TAG }}" >> $GITHUB_OUTPUT
+  # main_route:
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     nextjob: ${{ steps.check_message.outputs.nextjob }}
+  #   steps:
+  #     - name: Check commit message
+  #       id: check_message
+  #       run: |
+  #         message="${{ github.event.head_commit.message }}"
+  #         if [[ $message =~ run_([^[:space:]]+) ]]; then
+  #           echo "nextjob=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+  #           echo "成功设置下一步: ${BASH_REMATCH[1]}"
+  #         else
+  #           echo "nextjob=none" >> $GITHUB_OUTPUT
+  #           echo "未设置下一步"
+  #         fi
+  #       shell: bash
+  #     - name: output_tag
+  #       run: echo "LATEST_TAG=${{ env.LATEST_TAG }}" >> $GITHUB_OUTPUT
 
   debug_info:
-    needs: main_route
-    if: needs.main_route.outputs.nextjob != 'none'
     runs-on: ubuntu-latest
     steps:
       - name: Show routing info
@@ -66,43 +88,10 @@ jobs:
 
       - name: Show environment variables
         run: env
-  # 构建和发布 npm 包
-  build_npm_packages:
-    needs: [main_route]
-    if: needs.main_route.outputs.nextjob == 'build_npm_packages'
+
+
+  mtmai_test:
     runs-on: ubuntu-latest
-    steps:
-      - name: Setup GitHub CLI
-        run: |
-          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-          && sudo apt update \
-          && sudo apt install gh -y
-
-      - name: Download with gh CLI
-        run: |
-          gh release download latest \
-            --repo codeh007/gomtm \
-            --pattern "gomtm" \
-            --dir .
-        env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: chmod
-        run: chmod +x ./gomtm
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-      - name: 使用 gomtm build 构建 npm 包
-        run: ./gomtm release build_npm_packages
-
-  build_py:
-    runs-on: ubuntu-latest
-    needs: [main_route]
-    if: needs.main_route.outputs.nextjob == 'build_py'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -118,24 +107,11 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "**/pyproject.toml"
 
+      - name: install python pyproject
+        run: uv pip install -e .
 
-      - name: Setup GitHub CLI
+      - name: run worker
         run: |
-          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-          && sudo apt update \
-          && sudo apt install gh -y
+          python -m mtmai worker2
 
-      - name: Download gomtm CLI
-        run: |
-          gh release download latest \
-            --repo codeh007/gomtm \
-            --pattern "gomtm" \
-            --dir .
-        env:
-          GH_TOKEN: ${{ secrets.MAIN_GH_TOKEN }}
 
-      - name: Make gomtm executable
-        run: chmod +x ./gomtm
