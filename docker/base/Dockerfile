@@ -8,7 +8,6 @@ ARG DEFAULT_PASSWORD=${DEFAULT_PASSWORD:-"Admin123!@"}
 FROM debian AS base
 ARG NONROOT_USER=${NONROOT_USER:-"user"}
 
-
 ENV BUILD_STAGE=true
 ENV PATH=/app/bin:/app/hack:/app/hack/dev:/app/hack:${HOME}/.local/bin:$PATH
 ENV SHELL=/bin/bash
