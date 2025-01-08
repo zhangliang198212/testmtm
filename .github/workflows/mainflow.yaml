@@ -1,17 +1,6 @@
 name: build
 
 on:
-  workflow_dispatch:
-    inputs:
-      input:
-        description: "功能选项 (1: 仅构建, 2: 构建并部署, 3: 构建docker镜像并发布)"
-        required: true
-        type: choice
-        options:
-          - "1"
-          - "2"
-          - "3"
-        default: "1"
   push:
     branches: ["main"]
     paths:
