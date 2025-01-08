@@ -1,0 +1,47 @@
+name: schedule_example
+on:
+  # push:
+  #   tags:
+  #     - "*"
+  #   branches:
+  #     - main
+  #   paths:
+  #     - docker/**/*
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Docker image tag"
+        default: "dev"
+      khoj:
+        description: "Build Khoj docker image"
+        type: boolean
+        default: true
+      khoj-cloud:
+        description: "Build Khoj cloud docker image"
+        type: boolean
+        default: true
+  schedule:
+    - cron: "*/10 * * * *" # 每10分钟运行一次
+env:
+  # Tag Image with tag name on release
+  # else with user specified tag (default 'dev') if triggered via workflow
+  # else with run_id if triggered via a pull request
+  # else with 'pre' (if push to master)
+  DOCKER_IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.event_name == 'workflow_dispatch' && github.event.inputs.tag || 'pre' }}
+
+jobs:
+  scheduled-job:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 # 限制最长运行时间为10分钟
+    steps:
+      - name: Your task
+        run: |
+          echo "Starting task..."
+          # 你的任务代码
+
+      # 可选：添加超时处理
+      - name: Cleanup on timeout
+        if: ${{ cancelled() }} # 当作业被取消（包括超时）时运行
+        run: |
+          echo "Job timed out or was cancelled"
+          # 清理代码
