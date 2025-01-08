@@ -1,0 +1,36 @@
+on:
+  push:
+    tags:
+      - "*"
+    branches:
+      - master
+    paths:
+      - docker/**
+
+env:
+  # Tag Image with tag name on release
+  # else with user specified tag (default 'dev') if triggered via workflow
+  # else with run_id if triggered via a pull request
+  # else with 'pre' (if push to master)
+  DOCKER_IMAGE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.event_name == 'workflow_dispatch' && github.event.inputs.tag || 'pre' }}
+
+jobs:
+  build:
+    name: Publish Khoj Docker Images
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: "local"
+            platform: linux/amd64
+            runner: ubuntu-latest
+          - image: "local"
+            platform: linux/arm64
+            runner: ubuntu-linux-arm64
+          - image: "cloud"
+            platform: linux/amd64
+            runner: ubuntu-latest
+          - image: "cloud"
+            platform: linux/arm64
+            runner: ubuntu-linux-arm64
+    runs-on: ${{ matrix.runner }}
