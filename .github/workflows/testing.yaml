@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - mtmai/**/*
+      - pyproject.toml
 
   pull_request:
     branches: ["main"]

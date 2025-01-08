@@ -21,6 +21,7 @@ dependencies = [
     "tiktoken>=0.7",
     "tqdm>=4.66.4",
     "minify-html>=0.15.0",
+    "click>=8.1.7,<9",
     "free-proxy>=1.1.1",
     "playwright>=1.43.0",
     "undetected-playwright>=0.3.0",
