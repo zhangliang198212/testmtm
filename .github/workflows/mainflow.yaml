@@ -98,3 +98,49 @@ jobs:
           bun-version: latest
       - name: 使用 gomtm build 构建 npm 包
         run: ./gomtm release build_npm_packages
+
+  build_py:
+    runs-on: ubuntu-latest
+    needs: [main_route]
+    if: needs.main_route.outputs.nextjob == 'build_py'
+    steps:
+      - name: 使用 gomtm build 构建 python 包
+        run: ./gomtm release build_py
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Setup GitHub CLI
+        run: |
+          type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+
+      - name: Download gomtm CLI
+        run: |
+          gh release download latest \
+            --repo codeh007/gomtm \
+            --pattern "gomtm" \
+            --dir .
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Make gomtm executable
+        run: chmod +x ./gomtm
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 使用 gomtm build 构建 python 包
+        run: ./gomtm release build_py
