@@ -107,6 +107,6 @@ jobs:
 
       - name: run worker
         run: |
-          python -m mtmai worker2
+          python mtmai/__main__.py worker2
 
 
